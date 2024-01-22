@@ -9,6 +9,7 @@ from module.update import (
     from_30_to_31,
     start_up,
     cache_image,
+    torrent_migration,
 )
 
 from .sub_thread import RenameThread, RSSThread
@@ -56,7 +57,12 @@ class Program(RenameThread, RSSThread):
         if not self.img_cache:
             logger.info("[Core] No image cache exists, create image cache.")
             cache_image()
-        await self.start()
+        if not self.torrent_hash:
+            logger.info(
+                "[Core] The hash field of the torrent table does not exist or its value is empty, get torrent hash."
+            )
+            torrent_migration()
+        self.start()
 
     async def start(self):
         self.stop_event.clear()
